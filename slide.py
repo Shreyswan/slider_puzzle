@@ -44,7 +44,7 @@ def main():
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     pygame.display.set_caption('Slide Puzzle')
-    BASICFONT = pygame.font.Font('freesansbold.ttf', BASICFONTSIZE)
+    BASICFONT = pygame.font.Font(None, BASICFONTSIZE)
 
     #Store the options buttons and their rectangles in OPTIONS.
     RESET_SURF, RESET_RECT = makeText('Reset', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 90)
@@ -64,8 +64,8 @@ def main():
 
         drawBoard(mainBoard, msg)
 
-        checkForQuit()
         for event in pygame.event.get():
+            checkForQuit(event)
             #Event handling loop
             if event.type == MOUSEBUTTONUP:
                 spotx, spoty = getSpotClicked(mainBoard, event.pos[0], event.pos[1])
@@ -115,13 +115,9 @@ def terminate():
     pygame.quit()
     sys.exit()
 
-def checkForQuit():
-    for event in pygame.event.get(QUIT):  #Get all the QUIT events.
-        terminate() #terminate if there are any QUIT events present
-    for event in pygame.event.get(KEYUP):  #Get all the KEYUP events.
-        if event.key == K_ESCAPE:
-            terminate()  #terminate if the KEYUP event was for the esc key.
-        pygame.event.post(event) #put the other KEYUP event objects back.
+def checkForQuit(event):
+    if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
+        terminate()
 
 def getStartingBoard():
     #Return a board data structure with tiles in the solved state.
@@ -277,7 +273,7 @@ def generateNewPuzzle(numSlides):
     board = getStartingBoard()
     drawBoard(board, '')
     pygame.display.update()
-    pygame.time.wait(500)
+    pygame.time.wait(10)
     lastMove = None
     for i in range(numSlides):
         move = getRandomMove(board, lastMove)
